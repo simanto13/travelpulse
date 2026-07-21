@@ -1,0 +1,19 @@
+from pydantic import BaseSettings, Field
+
+
+class Settings(BaseSettings):
+    APP_NAME: str = "SkySense Weather Service"
+    ENV: str = "development"
+    DEBUG: bool = True
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    DATABASE_URL: str = Field("", env="DATABASE_URL")
+    REDIS_URL: str = Field("redis://localhost:6379/0", env="REDIS_URL")
+    SECRET_KEY: str = Field("change-me", env="SECRET_KEY")
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
+
+
+settings = Settings()
