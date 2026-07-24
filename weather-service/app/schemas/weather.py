@@ -1,22 +1,17 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel
 from datetime import datetime
 
-
-class WeatherQuery(BaseModel):
-    city: str
-
-
-class CurrentWeatherResponse(BaseModel):
-    city: str
-    temperature_c: float = Field(..., description="Temperature in Celsius")
-    description: Optional[str] = None
-    observed_at: datetime
-
-
-class WeatherReport(BaseModel):
-    city: str
-    temperature_c: float
-    description: Optional[str] = None
-    reported_by: Optional[str] = None
-    reported_at: Optional[datetime]
+class WeatherResponse(BaseModel):
+    city:str
+    country:str
+    temperature_c:float
+    temperature_f:float
+    feels_like_c:float
+    humidity:int
+    wind_kph:float
+    pressure_mb:float
+    visibility_km:float
+    uv:float
+    condition:str
+    icon:str
+    last_updated:datetime

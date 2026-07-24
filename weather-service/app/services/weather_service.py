@@ -1,22 +1,30 @@
-from typing import Optional
-from datetime import datetime
-from app.clients.weather_client import fetch_current_weather_city
-from app.schemas.weather import CurrentWeatherResponse
-from app.core.config import settings
-
+import httpx
+from app.config import settings
+from app.utils.weather_mapper import map_weather
+from app.repositories.weather_repository import WeatherRepository
 
 class WeatherService:
-    def __init__(self, settings=None):
-        self.settings = settings or settings
 
-    async def get_current(self, city: str) -> Optional[CurrentWeatherResponse]:
-        raw = await fetch_current_weather_city(city)
-        if raw is None:
-            return None
-        # Normalize into schema
-        return CurrentWeatherResponse(
-            city=raw["city"],
-            temperature_c=raw["temperature_c"],
-            description=raw.get("description"),
-            observed_at=datetime.fromisoformat(raw["observed_at"]),
-        )
+    def __init__(self,db):
+        self.repo=WeatherRepository(db)
+
+    async def get_current_weather(self,city:str):
+
+        existing=self.repo.find_by_city(city)
+        if existing:
+            return existing
+
+        async with httpx.AsyncClient() as client:
+            response=await client.get(
+                "https://api.weatherapi.com/v1/current.json",
+                params={
+                    "key":settings.WEATHER_API_KEY,
+                    "q":city
+                }
+            )
+
+        response.raise_for_status()
+
+        weather=map_weather(response.json())
+
+        return self.repo.save(weather)
