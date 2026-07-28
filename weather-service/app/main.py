@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
+from app.api.v1.router import api_router
+from app.core.config import settings
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -16,13 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(api_router, prefix="/api/v1")
+
 @app.get("/")
 async def health():
     return {
         "service": settings.APP_NAME,
         "status": "UP"
     }
-
-# Example:
-# from app.api.weather import router as weather_router
-# app.include_router(weather_router, prefix="/weather", tags=["Weather"])

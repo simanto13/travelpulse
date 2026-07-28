@@ -1,5 +1,5 @@
 import httpx
-from app.config import settings
+from app.core.config import settings
 from app.utils.weather_mapper import map_weather
 from app.repositories.weather_repository import WeatherRepository
 
