@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
-    OPENAI_API_KEY:str=""
     OPENAI_MODEL:str="gpt-5"
     DATABASE_URL:str=""
     WEATHER_SERVICE_URL:str="http://weather-service:8000"
