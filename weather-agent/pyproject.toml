@@ -1,0 +1,16 @@
+[project]
+name = "travelpulse-weather-agent"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "httpx",
+  "sqlalchemy>=2.0",
+  "asyncpg",
+  "pydantic>=2",
+  "pydantic-settings",
+  "openai",
+  "alembic",
+  "structlog",
+]

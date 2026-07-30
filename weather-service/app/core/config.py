@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = Field("redis://localhost:6379/0", env="REDIS_URL")
     SECRET_KEY: str = Field("change-me", env="SECRET_KEY")
     WEATHER_API_KEY: str = Field("", env="WEATHER_API_KEY")
+    OPENAI_API_KEY: str
+    OPENAI_MODEL: str = "gpt-5"
+    MCP_SERVER_URL: str = "http://localhost:8080"
 
     model_config = SettingsConfigDict(
         env_file=".env",
