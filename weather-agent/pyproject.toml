@@ -13,4 +13,5 @@ dependencies = [
   "openai",
   "alembic",
   "structlog",
+  "mcp>=2.0",
 ]

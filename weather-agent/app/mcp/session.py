@@ -1,32 +1,32 @@
 """
 Owns the MCP ClientSession lifecycle.
 """
-from typing import Optional, Callable, Awaitable
+from typing import Optional, Callable, Awaitable, Any
 from .transport import MCPTransport
+from mcp.client.session import ClientSession
 
 class MCPSession:
     def __init__(self, transport: MCPTransport):
         self.transport = transport
-        self.client_session = None
+        self.client_session: Optional[ClientSession] = None
         self.initialized = False
-        self._message_callback: Optional[Callable[[dict], Awaitable[None]]] = None
 
-    async def initialize(self, message_callback: Optional[Callable[[dict], Awaitable[None]]] = None):
+    async def initialize(self, message_callback: Optional[Callable[[Any], Awaitable[None]]] = None):
         """
-        Initialize the session and start the transport receive loop using the
-        provided message_callback to handle incoming messages.
+        Initialize the MCP session by opening the stdio transport and setting
+        up the MCP client session.
         """
         if self.initialized:
             return
+
+        if message_callback is not None:
+            self.transport.set_message_handler(message_callback)
+
         await self.transport.open()
-        if message_callback:
-            self._message_callback = message_callback
-            # start receive loop which creates a background task inside transport
-            self.transport.start_receive(self._message_callback)
+        self.client_session = self.transport.client_session
         self.initialized = True
 
     async def shutdown(self):
-        # stop receive loop then close transport
-        self.transport.stop_receive()
         await self.transport.close()
+        self.client_session = None
         self.initialized = False

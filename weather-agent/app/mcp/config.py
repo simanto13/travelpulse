@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
 class MCPConfig(BaseModel):
-    server_url: str = "http://weather-mcp:3000/mcp"
+    command: str = "node"
+    args: list[str] = []
     timeout: float = 30.0

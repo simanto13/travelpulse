@@ -26,7 +26,11 @@ class MCPManager:
         await self.session.initialize(message_callback=self.handle_message)
         await self.registry.refresh()
         self._running = True
-        logger.info("MCPManager started and connected to %s", self.config.server_url)
+        logger.info(
+            "MCPManager started and connected to MCP subprocess %s %s",
+            self.config.command,
+            self.config.args,
+        )
 
     async def stop(self):
         self._running = False

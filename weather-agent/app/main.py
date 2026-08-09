@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import logging
+from pydantic import BaseModel
 from app.api.weather_chat import router as weather_router
 from app.config import settings
 from app.mcp.config import MCPConfig
@@ -10,8 +11,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="TravelPulse Weather Agent")
 app.include_router(weather_router)
 
+
+def _parse_mcp_args(raw_args: str) -> list[str]:
+    return [segment.strip() for segment in raw_args.split(",") if segment.strip()]
+
+
 # Create MCPManager using configuration from global settings
-mcp_config = MCPConfig(server_url=settings.MCP_SERVER_URL, timeout=settings.MCP_TIMEOUT)
+mcp_config = MCPConfig(
+    command=settings.MCP_COMMAND,
+    args=_parse_mcp_args(settings.MCP_ARGS),
+    timeout=settings.MCP_TIMEOUT,
+)
 mcp_manager = MCPManager(config=mcp_config)
 
 @app.on_event("startup")
@@ -42,5 +52,23 @@ async def mcp_status():
     """
     return {
         "mcp_connected": mcp_manager.connected,
-        "mcp_server_url": settings.MCP_SERVER_URL,
+        "mcp_command": settings.MCP_COMMAND,
+        "mcp_args": _parse_mcp_args(settings.MCP_ARGS),
     }
+
+
+class MCPToolRequest(BaseModel):
+    tool: str
+    arguments: dict = {}
+
+
+@app.post("/mcp/tool")
+async def invoke_mcp_tool(request: MCPToolRequest):
+    if not mcp_manager.connected:
+        raise HTTPException(status_code=503, detail="MCP manager is not connected")
+
+    try:
+        result = await mcp_manager.executor.execute(request.tool, request.arguments)
+        return {"tool": request.tool, "result": result}
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
