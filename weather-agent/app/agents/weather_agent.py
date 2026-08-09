@@ -1,7 +1,15 @@
 class WeatherAgent:
-    def __init__(self,planner,orchestrator):
-        self.planner=planner
-        self.orchestrator=orchestrator
-    async def chat(self,question:str,conversation=None):
-        plan=await self.planner.plan(question)
-        return await self.orchestrator.chat(question,conversation)
+
+    def __init__(self, orchestrator):
+        self.orchestrator = orchestrator
+
+    async def chat(
+        self,
+        message: str,
+        conversation=None,
+    ):
+
+        return await self.orchestrator.run(
+            user_message=message,
+            conversation=conversation,
+        )

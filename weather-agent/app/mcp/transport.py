@@ -76,6 +76,9 @@ class MCPTransport:
         )
         await self._client_session.__aenter__()
 
+        # Complete the MCP initialization handshake.
+        await self._client_session.initialize()
+
         self._running = True
         logger.info(
             "MCPTransport: started MCP subprocess %s %s",

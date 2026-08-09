@@ -1,8 +1,28 @@
 from openai import AsyncOpenAI
+
+from app.config import settings
+
+
 class LLMClient:
-    def __init__(self,api_key:str,model:str="gpt-5"):
-        self.client=AsyncOpenAI(api_key=api_key)
-        self.model=model
-    async def generate(self,messages):
-        # TODO: call Responses API
-        return "Placeholder response"
+
+    def __init__(self):
+
+        self.client = AsyncOpenAI(
+            api_key=settings.openai_api_key
+        )
+
+        self.model = settings.openai_model
+
+    async def create_response(
+        self,
+        input,
+        tools=None,
+        instructions=None,
+    ):
+
+        return await self.client.responses.create(
+            model=self.model,
+            instructions=instructions,
+            input=input,
+            tools=tools or [],
+        )
