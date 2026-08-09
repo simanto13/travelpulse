@@ -3,6 +3,7 @@ from app.database import Base
 
 class WeatherCurrent(Base):
     __tablename__="weather_current"
+    __table_args__ = {"schema": "weather"}
 
     id=Column(Integer,primary_key=True,index=True)
     city=Column(String(100),index=True)
